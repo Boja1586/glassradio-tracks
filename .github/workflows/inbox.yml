@@ -1,0 +1,29 @@
+name: inbox
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Забрать посты из телеги
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          OWNER_IDS: "7453026496"
+        run: python .github/scripts/inbox_once.py
+      - name: Закоммитить новое
+        run: |
+          git config user.name "glassradio-bot"
+          git config user.email "glassradio-bot@users.noreply.github.com"
+          git add tracks.json inbox_offset.txt
+          git diff --cached --quiet || git commit -m "Auto: tracks from inbox"
+          git push
