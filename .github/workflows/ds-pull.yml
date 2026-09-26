@@ -1,0 +1,28 @@
+name: ds-pull
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Выгрузка Discord
+        env:
+          DS_TOKEN: ${{ secrets.DS_TOKEN }}
+        run: python .github/scripts/ds_pull.py --targets "${{ vars.DS_TARGETS }}" --repo "$GITHUB_WORKSPACE"
+      - name: Закоммитить новое
+        run: |
+          git config user.name "glassradio-bot"
+          git config user.email "glassradio-bot@users.noreply.github.com"
+          git add tracks.json
+          git diff --cached --quiet || git commit -m "Auto: tracks from Discord"
+          git push
