@@ -11,7 +11,7 @@ import re
 import urllib.request
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.dirname(BASE)
+REPO = os.path.dirname(os.path.dirname(BASE))
 TRACKS = os.path.join(REPO, "tracks.json")
 OFFSET_FILE = os.path.join(REPO, "inbox_offset.txt")
 
@@ -21,12 +21,19 @@ OWNERS = {x.strip() for x in os.environ.get("OWNER_IDS", "").split(",") if x.str
 
 
 def api(method, params=None):
+    import urllib.error
     data = json.dumps(params).encode() if params else None
     req = urllib.request.Request(
         f"https://api.telegram.org/bot{TOKEN}/{method}", data=data,
         headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=40) as r:
-        return json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=40) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code == 409:
+            print("поллинг занят другим процессом, выхожу без ошибки")
+            raise SystemExit(0)
+        raise
 
 
 def economy_check(code):
