@@ -158,7 +158,7 @@ $("next").onclick = () => {
   if (page < Math.ceil(view.length / PER)) { page++; render(); }
 };
 
-fetch("./tracks.json")
+fetch("./AllTracks.json")
   .then(r => r.json())
   .then(d => {
     all = Array.isArray(d) ? d : [];

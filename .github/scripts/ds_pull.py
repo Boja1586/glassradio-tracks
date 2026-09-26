@@ -11,7 +11,7 @@
 
 Что делает: качает все сообщения текстовых каналов (пагинация),
 складывает в ds_export/<id>.json и .txt, вытаскивает ID 6-15 цифр,
-проверяет что это аудио Roblox, новые дописывает в tracks.json и пушит.
+проверяет что это аудио Roblox, новые дописывает в AllTracks.json и пушит.
 Токен можно сохранить в E:\\RadioBot\\ds_token.txt чтобы не вводить.
 """
 
@@ -28,7 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 BASE = os.path.dirname(os.path.abspath(__file__))
 EXPORT_DIR = os.path.join(BASE, "ds_export")
 REPO_DIR = r"C:\Users\rusla\AppData\Local\Temp\opencode\radio-bg"
-TRACKS = os.path.join(REPO_DIR, "tracks.json")
+TRACKS = os.path.join(REPO_DIR, "AllTracks.json")
 
 ID_RE = re.compile(r"\d{6,15}")
 TOKEN_FILE = os.path.join(BASE, "ds_token.txt")
@@ -100,7 +100,7 @@ def economy_check(code):
 def git_push():
     env = dict(os.environ)
     env["GIT_TERMINAL_PROMPT"] = "0"
-    subprocess.run(["git", "add", "tracks.json"], cwd=REPO_DIR,
+    subprocess.run(["git", "add", "AllTracks.json"], cwd=REPO_DIR,
                    capture_output=True, env=env)
     done = subprocess.run(["git", "diff", "--cached", "--quiet"],
                           cwd=REPO_DIR, capture_output=True, env=env)
@@ -138,7 +138,7 @@ def main():
     if repo_arg:
         global REPO_DIR, TRACKS
         REPO_DIR = repo_arg
-        TRACKS = os.path.join(REPO_DIR, "tracks.json")
+        TRACKS = os.path.join(REPO_DIR, "AllTracks.json")
     pairs = []
     if targets_arg:
         for part in targets_arg.split(","):

@@ -24,7 +24,7 @@ jobs:
         run: |
           git config user.name "glassradio-bot"
           git config user.email "glassradio-bot@users.noreply.github.com"
-          git add tracks.json
+          git add AllTracks.json
           if [ -f inbox_offset.txt ]; then git add inbox_offset.txt; fi
           git diff --cached --quiet || git commit -m "Auto: tracks from inbox"
           git push

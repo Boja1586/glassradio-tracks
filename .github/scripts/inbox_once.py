@@ -12,7 +12,7 @@ import urllib.request
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(BASE))
-TRACKS = os.path.join(REPO, "tracks.json")
+TRACKS = os.path.join(REPO, "AllTracks.json")
 OFFSET_FILE = os.path.join(REPO, "inbox_offset.txt")
 
 ID_RE = re.compile(r"\d{6,15}")
