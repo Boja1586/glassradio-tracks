@@ -24,6 +24,22 @@
   header h1 { font-size: 24px; }
   header p { opacity: .8; font-size: 13px; margin-top: 4px; }
   #stats { font-size: 13px; color: #c4a4ff; margin: 10px 2px; }
+  .searchrow { display: flex; gap: 8px; }
+  .searchrow #search { flex: 1; width: auto; }
+  #search { flex: 1; }
+  #random {
+    flex-shrink: 0;
+    background: #8264e6;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 0 16px;
+    cursor: pointer;
+  }
+  #random:hover { background: #9375f5; }
+  .row.flash { outline: 2px solid #e0b3ff; }
   #search {
     width: 100%;
     padding: 12px 14px;
@@ -92,7 +108,10 @@
     <h1>GlassRadio — сборник</h1>
     <p>Коды музыки Roblox. Нажми «Код» — скопируется, вставь в игру.</p>
   </header>
-  <input id="search" type="text" placeholder="Поиск по названию или коду..." autocomplete="off">
+  <div class="searchrow">
+    <input id="search" type="text" placeholder="Поиск по названию или коду..." autocomplete="off">
+    <button id="random">Рандом</button>
+  </div>
   <div id="stats">Загрузка...</div>
   <div id="list"></div>
   <div id="pager">
@@ -104,7 +123,7 @@
 </div>
 <script>
 const PER = 20;
-let all = [], view = [], page = 1;
+let all = [], view = [], page = 1, flashId = null;
 const $ = id => document.getElementById(id);
 
 function render() {
@@ -115,7 +134,7 @@ function render() {
   $("list").innerHTML = "";
   for (const t of slice) {
     const row = document.createElement("div");
-    row.className = "row";
+    row.className = "row" + ((flashId && t.id === flashId) ? " flash" : "");
     const name = document.createElement("div");
     name.className = "t";
     name.textContent = t.name;
@@ -156,6 +175,21 @@ $("search").addEventListener("input", applyFilter);
 $("prev").onclick = () => { if (page > 1) { page--; render(); } };
 $("next").onclick = () => {
   if (page < Math.ceil(view.length / PER)) { page++; render(); }
+};
+$("random").onclick = async () => {
+  if (!view.length) return;
+  const pick = view[Math.floor(Math.random() * view.length)];
+  page = Math.floor(view.indexOf(pick) / PER) + 1;
+  flashId = pick.id;
+  render();
+  try { await navigator.clipboard.writeText(pick.id); }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = pick.id; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  $("stats").textContent = `Рандом: ${pick.name} — код скопирован, вставь в игру`;
+  setTimeout(() => { flashId = null; render(); }, 2500);
 };
 
 fetch("./AllTracks.json")
